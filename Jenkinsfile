@@ -61,5 +61,18 @@ pipeline {
                 }
             }
         }
+
+        stage('Terraform destroy') {    
+            steps {
+                script {
+                    withAWS(credentials: 'aws_jenkins_key', region: 'us-east-1') {
+                        sh '''
+                        echo "------terraform apply--------"
+                        terraform destroy -auto-approve
+                        '''
+                    }
+                }
+            }
+        }
     }
 }
