@@ -2,6 +2,14 @@ pipeline {
 
     agent any
 
+    parameters {
+        choice(
+            name: 'ACTION',
+            choices: ['apply', 'destroy'],
+            description: 'Choose Terraform action to perform'
+        )
+    }
+
     environment {
         AWS_REGION = 'us-east-1'
     }
@@ -26,9 +34,9 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 script {
-                    withAWS(credentials: 'aws_jenkins_key', region: 'us-east-1') {
+                    withAWS(credentials: 'aws_jenkins_key', region: AWS_REGION) {
                         sh '''
-                        echo "------terraform init--------"
+                        echo "------ terraform init --------"
                         terraform init
                         '''
                     }
@@ -39,9 +47,9 @@ pipeline {
         stage('Terraform Plan') {
             steps {
                 script {
-                    withAWS(credentials: 'aws_jenkins_key', region: 'us-east-1') {
+                    withAWS(credentials: 'aws_jenkins_key', region: AWS_REGION) {
                         sh '''
-                        echo "------terraform plan--------"
+                        echo "------ terraform plan --------"
                         terraform plan
                         '''
                     }
@@ -50,11 +58,14 @@ pipeline {
         }
 
         stage('Terraform Apply') {
+            when {
+                expression { params.ACTION == 'apply' }
+            }
             steps {
                 script {
-                    withAWS(credentials: 'aws_jenkins_key', region: 'us-east-1') {
+                    withAWS(credentials: 'aws_jenkins_key', region: AWS_REGION) {
                         sh '''
-                        echo "------terraform apply--------"
+                        echo "------ terraform apply --------"
                         terraform apply -auto-approve
                         '''
                     }
@@ -62,12 +73,15 @@ pipeline {
             }
         }
 
-        stage('Terraform destroy') {    
+        stage('Terraform Destroy') {
+            when {
+                expression { params.ACTION == 'destroy' }
+            }
             steps {
                 script {
-                    withAWS(credentials: 'aws_jenkins_key', region: 'us-east-1') {
+                    withAWS(credentials: 'aws_jenkins_key', region: AWS_REGION) {
                         sh '''
-                        echo "------terraform apply--------"
+                        echo "------ terraform destroy --------"
                         terraform destroy -auto-approve
                         '''
                     }
