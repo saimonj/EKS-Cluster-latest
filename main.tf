@@ -63,8 +63,8 @@ resource "aws_eks_cluster" "eks-cluster" {
   version  = "1.33"
 
   vpc_config {
-    subnet_ids         = ["subnet-00a2921ddce84b773", "subnet-0884091f590eb3f84"]
-    security_group_ids = ["sg-0bb25d7ef1c8b14d8"]
+    subnet_ids         = ["subnet-0f6740510d9ca4ef5", "subnet-08c3d02ea7ee82d0b"]
+    security_group_ids = ["sg-0eb7d89dea9ec9d00"]
   }
 
   depends_on = [aws_iam_role_policy_attachment.cluster-policy]
@@ -75,7 +75,7 @@ resource "aws_eks_node_group" "k8-cluster-node-group" {
   cluster_name    = aws_eks_cluster.eks-cluster.name
   node_group_name = "k8-cluster-node-group-latest"
   node_role_arn   = aws_iam_role.node-role.arn
-  subnet_ids      = ["subnet-00a2921ddce84b773", "subnet-0884091f590eb3f84"]
+  subnet_ids      = ["subnet-0f6740510d9ca4ef5", "subnet-08c3d02ea7ee82d0b"]
 
 
   scaling_config {
