@@ -1,3 +1,4 @@
+
 # IAM Role for the EKS Cluster
 resource "aws_iam_role" "cluster-role" {
   name = "cluster-role-2"
@@ -59,27 +60,23 @@ resource "aws_iam_role_policy_attachment" "registry-policy" {
 # EKS Cluster
 resource "aws_eks_cluster" "eks-cluster" {
   name     = "k8-cluster-latest"
-  role_arn = aws_iam_role.eks-cluster-role.arn
+  role_arn = aws_iam_role.cluster-role.arn
+  version  = "1.33"
 
   vpc_config {
-    subnet_ids = [
-      "subnet-060f8394a52ab6584",
-      "subnet-0f01696033ae2dd9a"
-    ]
+    subnet_ids         = ["subnet-0ea1a8ee2a83956f1", "subnet-0e876388679c808e7"]
+    security_group_ids = ["sg-0ea1b57d75a7ec2eb"]
   }
-}
 
+  depends_on = [aws_iam_role_policy_attachment.cluster-policy]
+}
 
 # EKS Node Group
 resource "aws_eks_node_group" "k8-cluster-node-group" {
   cluster_name    = aws_eks_cluster.eks-cluster.name
   node_group_name = "k8-cluster-node-group-latest"
   node_role_arn   = aws_iam_role.node-role.arn
-  subnet_ids = [
-  "subnet-060f8394a52ab6584",
-  "subnet-0f01696033ae2dd9a"
-]
-
+  subnet_ids      = ["subnet-0ea1a8ee2a83956f1", "subnet-0e876388679c808e7"]
 
 
   scaling_config {
